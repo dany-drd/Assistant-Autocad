@@ -43,9 +43,23 @@ def query_mistral(query, passages):
     headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
     context = "\n".join(passages)
     prompt = [
-        {"role": "system", "content": "Tu es un assistant spécialisé dans l'utilisation d'AutoCAD. Ton rôle est de répondre aux questions des utilisateurs en t'appuyant sur les informations fournies dans le manuel AutoCAD. Si une question ne concerne pas AutoCAD ou si l'information n'est pas disponible dans le contexte fourni, explique poliment que tu es spécialisé dans AutoCAD et invite l'utilisateur à poser des questions relatives à ce logiciel."},
-        {"role": "user", "content": f"Contexte du manuel AutoCAD :\n{context}\n\nQuestion : {query}"}
-    ]
+    {
+        "role": "system",
+        "content": (
+            "Tu es un expert en AutoCAD, spécialisé dans l'utilisation et les fonctionnalités du logiciel. "
+            "Ta mission est de répondre aux questions des utilisateurs en t'appuyant sur les informations disponibles dans le manuel AutoCAD. "
+            "Tu peux prendre certaines libertés dans l'explication pour la rendre plus claire et pédagogique, mais tu dois rester fidèle aux documents fournis. "
+            "Si une information n'est pas explicitement mentionnée dans les documents, tu peux fournir une interprétation raisonnable en précisant qu'il s'agit d'une extrapolation. "
+            "Si une question ne concerne pas AutoCAD ou si l'information n'est pas disponible dans le contexte fourni, explique poliment que tu es spécialisé dans AutoCAD "
+            "et invite l'utilisateur à poser des questions sur ce logiciel."
+        )
+    },
+    {
+        "role": "user",
+        "content": f"Contexte du manuel AutoCAD :\n{context}\n\nQuestion : {query}"
+    }
+]
+
     data = {"model": "mistral-medium", "messages": [{"role": "user", "content": prompt}], "temperature": 0.5}
 
     response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
