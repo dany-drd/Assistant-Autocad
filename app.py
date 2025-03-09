@@ -42,7 +42,10 @@ def search_faiss(query, top_k=3):
 def query_mistral(query, passages):
     headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
     context = "\n".join(passages)
-    prompt = f"Voici des extraits du manuel AutoCAD :\n{context}\n\nQuestion : {query}\nRéponse :"
+    prompt = [
+        {"role": "system", "content": "Tu es un assistant spécialisé dans l'utilisation d'AutoCAD. Ton rôle est de répondre aux questions des utilisateurs en t'appuyant sur les informations fournies dans le manuel AutoCAD. Si une question ne concerne pas AutoCAD ou si l'information n'est pas disponible dans le contexte fourni, explique poliment que tu es spécialisé dans AutoCAD et invite l'utilisateur à poser des questions relatives à ce logiciel."},
+        {"role": "user", "content": f"Contexte du manuel AutoCAD :\n{context}\n\nQuestion : {query}"}
+    ]
     data = {"model": "mistral-medium", "messages": [{"role": "user", "content": prompt}], "temperature": 0.5}
 
     response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
