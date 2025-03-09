@@ -110,7 +110,8 @@ if st.button("🔎 Rechercher"):
         st.session_state.messages.append({"role": "assistant", "content": response})
         
         # Effacer le champ de saisie après envoi
-        st.session_state["query_input"] = ""
+        if "query_input" in st.session_state:   
+            st.session_state["query_input"] = ""
         st.rerun()
     else:
         st.warning("⚠️ Veuillez entrer une question avant de rechercher.")
