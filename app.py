@@ -18,6 +18,8 @@ model = SentenceTransformer(MODEL_NAME)
 # Initialiser l'historique des messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "query_input" not in st.session_state:
+    st.session_state.query_input = ""
 
 # Fonction pour charger FAISS et les métadonnées
 def load_faiss_and_metadata():
@@ -110,8 +112,7 @@ if st.button("🔎 Rechercher"):
         st.session_state.messages.append({"role": "assistant", "content": response})
         
         # Effacer le champ de saisie après envoi
-        if "query_input" in st.session_state:   
-            st.session_state["query_input"] = ""
+        st.session_state.query_input = ""
         st.rerun()
     else:
         st.warning("⚠️ Veuillez entrer une question avant de rechercher.")
