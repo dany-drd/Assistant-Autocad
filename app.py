@@ -44,13 +44,27 @@ def search_faiss(query, top_k=3):
     results = [metadata[str(i)] for i in indices[0] if str(i) in metadata]
     return results
 
-# Appel API Mistral avec conservation du contexte
+# Appel API Mistral avec conservation du contexte et un prompt défini
 def query_mistral(query, passages):
     headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
     context = "\n".join(passages)
     
     # Ajouter l'historique des échanges
     messages = [{"role": msg["role"], "content": msg["content"]} for msg in st.session_state.messages]
+    
+    # Ajouter le prompt système
+    messages.insert(0, {
+        "role": "system",
+        "content": (
+            "Tu es un expert en AutoCAD, spécialisé dans l'utilisation et les fonctionnalités du logiciel. "
+            "Répond toujours en français. "
+            "Ta mission est de répondre aux questions des utilisateurs en t'appuyant sur les informations disponibles dans le manuel AutoCAD. "
+            "Tu peux prendre certaines libertés dans l'explication pour la rendre plus claire et pédagogique, mais tu dois rester fidèle aux documents fournis. "
+            "Si une information n'est pas explicitement mentionnée dans les documents, tu peux fournir une interprétation raisonnable en précisant qu'il s'agit d'une extrapolation. "
+            "Si une question ne concerne pas AutoCAD ou si l'information n'est pas disponible dans le contexte fourni, explique poliment que tu es spécialisé dans AutoCAD "
+            "et invite l'utilisateur à poser des questions sur ce logiciel."
+        )
+    })
     
     # Ajouter la nouvelle question
     messages.append({"role": "user", "content": f"Contexte du manuel AutoCAD :\n{context}\n\nQuestion : {query}"})
@@ -78,8 +92,8 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# Saisie utilisateur
-query = st.text_input("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?")
+# Saisie utilisateur (avec zone de texte persistante)
+query = st.text_area("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?")
 
 if st.button("🔎 Rechercher"):
     if query:
@@ -94,8 +108,7 @@ if st.button("🔎 Rechercher"):
         st.session_state.messages.append({"role": "user", "content": query})
         st.session_state.messages.append({"role": "assistant", "content": response})
 
-        # Afficher la réponse
-        with st.chat_message("assistant"):
-            st.markdown(response)
+        # Effacer le champ de saisie pour permettre une nouvelle question
+        st.experimental_rerun()
     else:
         st.warning("⚠️ Veuillez entrer une question avant de rechercher.")
