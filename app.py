@@ -87,13 +87,14 @@ st.set_page_config(page_title="Assistant AutoCAD", page_icon="🔧")
 st.title("🔧 Assistant AutoCAD")
 st.write("Posez une question sur AutoCAD et obtenez une réponse instantanée")
 
-# Affichage de l'historique des échanges
+# Affichage de l'historique des échanges avec icônes personnalisées
 for msg in st.session_state.messages:
+    icon = "👤" if msg["role"] == "user" else "🤖"
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+        st.markdown(f"{icon} {msg['content']}")
 
-# Saisie utilisateur (avec zone de texte persistante)
-query = st.text_area("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?")
+# Saisie utilisateur (avec zone de texte vide après envoi)
+query = st.text_area("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?", key="query_input")
 
 if st.button("🔎 Rechercher"):
     if query:
@@ -107,9 +108,9 @@ if st.button("🔎 Rechercher"):
         # Ajouter la question et la réponse à l'historique
         st.session_state.messages.append({"role": "user", "content": query})
         st.session_state.messages.append({"role": "assistant", "content": response})
-
-        # Effacer le champ de saisie pour permettre une nouvelle question
+        
+        # Effacer le champ de saisie après envoi
+        st.session_state["query_input"] = ""
         st.rerun()
-
     else:
         st.warning("⚠️ Veuillez entrer une question avant de rechercher.")
