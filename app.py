@@ -56,7 +56,7 @@ st.set_page_config(page_title="Assistant AutoCAD", page_icon="🔧")
 st.title("🔧 Assistant AutoCAD")
 st.write("Posez une question sur AutoCAD et obtenez une réponse instantanée")
 
-query = st.text_input("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD")
+query = st.text_input("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?")
 
 if st.button("🔎 Rechercher"):
     if query:
