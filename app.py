@@ -18,8 +18,6 @@ model = SentenceTransformer(MODEL_NAME)
 # Initialiser l'historique des messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "query_input" not in st.session_state:
-    st.session_state.query_input = ""
 
 # Fonction pour charger FAISS et les métadonnées
 def load_faiss_and_metadata():
@@ -89,14 +87,13 @@ st.set_page_config(page_title="Assistant AutoCAD", page_icon="🔧")
 st.title("🔧 Assistant AutoCAD")
 st.write("Posez une question sur AutoCAD et obtenez une réponse instantanée")
 
-# Affichage de l'historique des échanges avec icônes personnalisées
+# Affichage de l'historique des échanges
 for msg in st.session_state.messages:
-    icon = "👤" if msg["role"] == "user" else "🤖"
     with st.chat_message(msg["role"]):
-        st.markdown(f"{icon} {msg['content']}")
+        st.markdown(msg["content"])
 
-# Saisie utilisateur (avec zone de texte vide après envoi)
-query = st.text_area("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?", key="query_input")
+# Saisie utilisateur (avec zone de texte persistante)
+query = st.text_area("📝 Entrez votre question :", placeholder="Quelles sont les principales commandes AutoCAD ?")
 
 if st.button("🔎 Rechercher"):
     if query:
@@ -110,9 +107,9 @@ if st.button("🔎 Rechercher"):
         # Ajouter la question et la réponse à l'historique
         st.session_state.messages.append({"role": "user", "content": query})
         st.session_state.messages.append({"role": "assistant", "content": response})
-        
-        # Effacer le champ de saisie après envoi
-        st.session_state.query_input = ""
+
+        # Effacer le champ de saisie pour permettre une nouvelle question
         st.rerun()
+
     else:
         st.warning("⚠️ Veuillez entrer une question avant de rechercher.")
